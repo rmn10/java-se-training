@@ -11,6 +11,6 @@ abstract class Draw {
 
     double lineWidth;
 
-    abstract void style(Color c, Color f, double w);
+    abstract void style(Color lineColor, Color fillColor, double lineWidth);
 
 }

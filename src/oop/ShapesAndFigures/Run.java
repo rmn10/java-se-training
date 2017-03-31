@@ -3,22 +3,22 @@
  *
  * This is a simple example, how to use EXTENDS
  *
- * Class Draw - is a abstract class that contains style (color, fill, lineheight) parameters of the objects
- * Classes Lineparams, CircleParams, RectangleParams - contains size and coordinates parameters for every objects
+ * Класс Draw - общие для всех свойства (цветовой стиль)- цвет линий, цвет заливки (если это фигуры), толщина линий
  *
- * P.S. i not release here drawing for DOT and POLIGONES classes
+ * Классы MyLine, MyCircle, MyRectangle - описывают характеристики фигур (координаты и размерности)
  *
+ * Клавиши D - dot, L - Line, C - Circle, R - Rectangle, P - Polygon, ESC - Exit
  *
  */
 
 import javafx.application.Application;
 import javafx.scene.Group;
 import javafx.scene.Scene;
+import javafx.scene.input.KeyCode;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.*;
 import javafx.stage.Stage;
 import javafx.scene.text.Text;
-
 
 public class Run extends Application {
 
@@ -30,72 +30,153 @@ public class Run extends Application {
     public void start(Stage primaryStage) {
         primaryStage.setTitle("My drawing example of the shapes");
         Group root = new Group();
-        Scene scene = new Scene(root, 400, 300, Color.WHITE);
 
-        //here is i was make a drawing of the line. i complicated, because i make it from "moveTo-LineTo"
-        Path path = new Path();
+        Scene scene = new Scene(root, 580, 300, Color.WHITE);
 
-        LineParams fig1 = new LineParams();
-        fig1.myLine(50, 50, 50, 250);
-        fig1.style(Color.BLUE, Color.WHITE, 7);
+        /* fig1 - объект ТОЧКА. Координаты X,Y. Имеет свойство lineColor*/
+        Path dot = new Path();
 
+        MyDot fig1 = new MyDot();
+
+        /* объект fig1 -  "отрезок". Координаты начала (startX,StartY), конец (endX,endY)*/
+        fig1.myDot(15, 150);
+
+        /* цветовой стиль всех моих фигур задается через абстрактный метод style из класса Draw. */
+        fig1.style(Color.BLACK, Color.WHITE, 5);
+
+        /* далее - наполняю объект dot */
         MoveTo moveTo = new MoveTo();
-        moveTo.setX(fig1.getstartX());
-        moveTo.setY(fig1.getstartY());
+        moveTo.setX(fig1.getX());
+        moveTo.setY(fig1.getY());
 
+        /* чтобы можно было различить на экране - рисую с помощью прямой с координатами (x,y ; x+1,y+1)
+           в myDot принудительно задал толщину этой линии больше 1пикс.*/
         LineTo lineTo = new LineTo();
-        lineTo.setX(fig1.getendX());
-        lineTo.setY(fig1.getendY());
-        path.getElements().add(moveTo);
-        path.getElements().add(lineTo);
-        path.setStrokeWidth(fig1.lineWidth);
-        path.setStroke(fig1.lineColor);
+        lineTo.setX(fig1.getX()+1);
+        lineTo.setY(fig1.getY()+1);
+        dot.getElements().add(moveTo);
+        dot.getElements().add(lineTo);
+        dot.setStrokeWidth(fig1.lineWidth);
+        dot.setStroke(fig1.lineColor);
 
-        // set the parameters of the my_circle
-        CircleParams fig2 = new CircleParams();
-        fig2.myCircle(150,150,60);
-        fig2.style(Color.BROWN, Color.YELLOW, 3);
 
-        //input rectangle parameters to the javaFX object
+        /* Создаю объект fig2, который представляет из отрезок */
+        MyLine fig2 = new MyLine();
+
+        /* параметры - startX, startY, endX, endY и цветовой стиль с параметрами как у отрезка
+         - цвет линий, заливка, толщина линий */
+        fig2.myLine(50,50,50,250);
+        fig2.style(Color.BLUE, Color.WHITE, 5);
+
+        /* заполняю параметрами объект line */
+        Line line = new Line();
+        line.setStartX(fig2.getstartX());
+        line.setStartY(fig2.getstartY());
+        line.setEndX(fig2.getendX());
+        line.setEndY(fig2.getendY());
+        line.setFill(fig2.fillColor);
+        line.setStroke(fig2.lineColor);
+        line.setStrokeWidth(fig2.lineWidth);
+
+
+        /* Создаю объект fig3, который представляет из себя круг */
+        MyCircle fig3 = new MyCircle();
+
+        /* параметры - centerX, centerY, radius и цветовой стиль с параметрами как у отрезка
+         - цвет линий, заливка, толщина линий */
+        fig3.myCircle(150,150,60);
+        fig3.style(Color.BROWN, Color.YELLOW, 3);
+
+        /* заполняю параметрами объект circle, который нам нужно отобразить */
         Circle circle = new Circle();
-        circle.setCenterX(fig2.getxCenter());
-        circle.setCenterY(fig2.getyCenter());
-        circle.setRadius(fig2.getRadius());
-        circle.setFill(fig2.fillColor);
-        circle.setStroke(fig2.lineColor);
-        circle.setStrokeWidth(fig2.lineWidth);
+        circle.setCenterX(fig3.getxCenter());
+        circle.setCenterY(fig3.getyCenter());
+        circle.setRadius(fig3.getRadius());
+        circle.setFill(fig3.fillColor);
+        circle.setStroke(fig3.lineColor);
+        circle.setStrokeWidth(fig3.lineWidth);
 
-        // set the parameters of the my_rectangle
-        RectangleParams fig3 = new RectangleParams();
-        fig3.myRectangle(250, 110, 120, 80);
-        fig3.style(Color.RED, Color.CYAN, 2);
 
-        //input rectangle parameters to the javaFX object
+
+        /* создаю объект "прямоугольник" с параметрами - x1,y1 - координаты левой верхней вершины
+            width, height - ширина и высота прямоугольника, и цветовым стилем с параметрами как ранее  */
+        MyRectangle fig4 = new MyRectangle();
+        fig4.myRectangle(250, 110, 120, 80);
+        fig4.style(Color.RED, Color.CYAN, 2);
+
+        /* создаю объект rectangle который будем отображать по образу и подобию нашего "прямоугольника" */
         Rectangle rectangle = new Rectangle();
-        rectangle.setX(fig3.x1);
-        rectangle.setY(fig3.y1);
-        rectangle.setWidth(fig3.width);
-        rectangle.setHeight(fig3.height);
-        rectangle.setFill(fig3.fillColor);
-        rectangle.setStroke(fig3.lineColor);
-        rectangle.setStrokeWidth(fig3.lineWidth);
+        rectangle.setX(fig4.getX());
+        rectangle.setY(fig4.getY());
+        rectangle.setWidth(fig4.getWidth());
+        rectangle.setHeight(fig4.getHeight());
+        rectangle.setFill(fig4.fillColor);
+        rectangle.setStroke(fig4.lineColor);
+        rectangle.setStrokeWidth(fig4.lineWidth);
 
-        // set the Annotation text
+
+        MyPolygon fig5 = new MyPolygon();
+        fig5.style(Color.DARKGREEN, Color.LIGHTGRAY, 2);
+
+        Polygon polygon = new Polygon(fig5.getPolygonPoints());
+
+        polygon.setFill(Color.SKYBLUE);
+        polygon.setStrokeWidth(3);
+        polygon.setStroke(Color.BLACK);
+
+
+        /* текстовый объект содержит информацию которая будет выведена под фигурами,
+         а именно, длина линии, и периметр фигур (измеряется в пикселях)
+          */
         Text text = new Text();
         text.setX(25) ;
         text.setY(280) ;
-        String anno = "L = "+String.format("%.2f", fig1.getLen()) +"\t\tL = "+ String.format("%.2f", fig2.getLen()) + "\t\t\t\tL = " + String.format("%.2f", fig3.getLen());
+        String anno = "L = "+String.format("%.2f", fig2.getLen()) +"\t\tP = "+ String.format("%.2f", fig3.getLen()) + "\t\t\t\tP = " + String.format("%.2f", fig4.getLen()) + "\t\t\t\tP = " + String.format("%.2f", fig5.getLen());
         text.setText(anno) ;
+
+
+        /* привязываю к сцене слушатель клавиатуры */
+        scene.setOnKeyPressed(event -> {
+            if (event.getCode() == KeyCode.ESCAPE) {         /* ESC - закрыть окно и выйти из программы */
+                primaryStage.close();
+            }
+
+            KeyCode keycode = event.getCode();
+
+            if (keycode == KeyCode.D) {                     /* D - отобразить/спрятать ТОЧКУ */
+                dot.setVisible(!dot.isVisible());
+            }
+
+            if (keycode == KeyCode.L) {                     /* L - отобразить/спрятать ОТРЕЗОК */
+                line.setVisible(!line.isVisible());
+            }
+
+            if (keycode == KeyCode.C) {                     /* C - отобразить/спрятать КРУГ */
+                circle.setVisible(!circle.isVisible());
+            }
+
+            if (keycode == KeyCode.R) {                     /* R - отобразить/спрятать ПРЯМОУГОЛЬНИК */
+                rectangle.setVisible(!rectangle.isVisible());
+            }
+
+            if (keycode == KeyCode.P) {                     /* R - отобразить/спрятать ПОЛИГОН */
+                polygon.setVisible(!polygon.isVisible());
+            }
+
+        });
+
 
         primaryStage.setScene(scene);
 
-        // add my figures to the scene
-        root.getChildren().add(path);
+        /* наполняю сцену фигурами */
+        root.getChildren().add(dot);
+        root.getChildren().add(line);
         root.getChildren().add(circle);
         root.getChildren().add(rectangle);
+        root.getChildren().add(polygon);
         root.getChildren().add(text);
 
-        //and show the scene ...
+        /* и вывожу это все на экран */
         primaryStage.show();
 
     }
